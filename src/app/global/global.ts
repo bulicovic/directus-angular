@@ -1,11 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  signal,
-  WritableSignal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, Signal } from '@angular/core';
 import { directus, Global } from '../../../directus';
 import { readSingleton } from '@directus/sdk';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { from } from 'rxjs';
+import { DirectusTemplate } from '../ui/directus-template/directus-template';
 
 @Component({
   selector: 'app-global',
@@ -15,17 +13,14 @@ import { readSingleton } from '@directus/sdk';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GlobalComponent {
-  readonly global: WritableSignal<Global> = signal<Global>({
-    title: '',
-    description: '',
-    slug: '',
-  });
-
-  constructor() {
-    this.getGlobal();
-  }
-
-  async getGlobal(): Promise<void> {
-    this.global.set(await directus.request<Global>(readSingleton('global')));
-  }
+  readonly global: Signal<Global> = toSignal(
+    from(directus.request<Global>(readSingleton('global'))),
+    {
+      initialValue: {
+        title: '',
+        description: '',
+        slug: '',
+      } as Global,
+    },
+  );
 }
