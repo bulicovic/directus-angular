@@ -4,10 +4,11 @@ import { directus, Page } from '../../../directus';
 import { readItems } from '@directus/sdk';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, switchMap } from 'rxjs';
+import { DirectusTemplate } from '../ui/directus-template/directus-template';
 
 @Component({
   selector: 'app-page',
-  imports: [],
+  imports: [DirectusTemplate],
   templateUrl: './page.html',
   styleUrl: './page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

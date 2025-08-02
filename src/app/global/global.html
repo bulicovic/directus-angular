@@ -1,4 +1,6 @@
 @if (global()) {
-  <h1>{{ global().title }}</h1>
-  <p>{{ global().description }}</p>
+  <app-directus-template>
+    <div template-header>{{ global().title }}</div>
+    <div tempate-body>{{ global().description }}</div>
+  </app-directus-template>
 }

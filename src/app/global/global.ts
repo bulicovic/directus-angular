@@ -7,7 +7,7 @@ import { DirectusTemplate } from '../ui/directus-template/directus-template';
 
 @Component({
   selector: 'app-global',
-  imports: [],
+  imports: [DirectusTemplate],
   templateUrl: './global.html',
   styleUrl: './global.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

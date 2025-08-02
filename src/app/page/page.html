@@ -1,4 +1,6 @@
 @if (page()) {
-  <h1 class="text-3xl font-bold">{{ page().title }}</h1>
-  <p class="mt-10" [innerHTML]="page().content"></p>
+  <app-directus-template>
+    <div template-header>{{ page().title }}</div>
+    <div tempate-body [innerHTML]="page().content"></div>
+  </app-directus-template>
 }
