@@ -1,13 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { directus, Page } from '../../../directus';
 import { readItems } from '@directus/sdk';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-page',
@@ -17,30 +13,27 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageComponent {
-  readonly page = signal<Page>({ slug: '', title: '', content: '' });
   readonly #route = inject(ActivatedRoute);
 
-  constructor() {
-    this.#route.paramMap.pipe(takeUntilDestroyed()).subscribe((params) => {
-      const slug = params.get('slug');
-      console.log(params);
-      if (slug) {
-        console.log(slug);
-        this.getPageBySlug(slug);
-      }
-    });
-  }
-
-  async getPageBySlug(slug: string): Promise<void> {
-    const pages = await directus.request<Page[]>(
-      readItems('pages', {
-        filter: {
-          slug: {
-            _eq: slug,
-          },
-        },
+  readonly page = toSignal(
+    this.#route.paramMap.pipe(
+      map((params) => {
+        console.log(params);
+        return params.get('slug');
       }),
-    );
-    this.page.set(pages[0]);
-  }
+      filter((slug) => slug !== null),
+      switchMap((slug) =>
+        directus
+          .request<Page[]>(
+            readItems('pages', {
+              filter: {
+                slug: { _eq: slug },
+              },
+            }),
+          )
+          .then((pages) => pages[0] || { slug: '', title: '', content: '' }),
+      ),
+    ),
+    { initialValue: { slug: '', title: '', content: '' } },
+  );
 }
